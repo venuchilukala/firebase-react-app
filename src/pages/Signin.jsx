@@ -2,17 +2,17 @@ import React, { useState } from "react";
 import { useFirebase } from "../context/firebase";
 import { useNavigate } from "react-router-dom";
 
-const Signup = () => {
-  const firebase = useFirebase();
+const Signin = () => {
+  const { siginUser, signinWithGoogle } = useFirebase();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   return (
     <div>
-        <h3>Signup Page</h3>
+      <h3>Signin Page</h3>
       <input
         onChange={(e) => setEmail(e.target.value)}
         value={email}
@@ -27,21 +27,21 @@ const Signup = () => {
         placeholder="Enter your password"
         required
       />
-      <br/>
+      <br />
       <button
         onClick={(e) => {
-          firebase.signupUser(email, password);
-          // eslint-disable-next-line
-          firebase.putData("users/" + "venu", { email, password });
+          siginUser(email, password);
         }}
       >
-        Signup
+        Signin
       </button>
-      <button onClick={()=> firebase.signinWithGoogle()}>Signin with Google</button>
+      <button onClick={() => signinWithGoogle()}>
+        Signin with Google
+      </button>
       <br />
-      <button onClick={() => navigate("/signin")}>Signin</button>
+      <button onClick={() => navigate("/signup")}>Signup</button>
     </div>
   );
 };
 
-export default Signup;
+export default Signin;
