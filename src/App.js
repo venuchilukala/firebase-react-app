@@ -1,22 +1,15 @@
-import {getDatabase, set, ref} from 'firebase/database'
-import { app } from './firebase';
 import './App.css';
+import Authentication from './firebase/Authentication';
+import RealtimeDb from './firebase/Database';
+import Signup from './pages/Signup';
 
-const db = getDatabase(app)
 
 function App() {
-  const putData = () => {
-    set(ref(db, "users/venu"),{
-      id: 1,
-      name: "Venu Chilukala",
-      age: "22"
-    })
-  }
-
   return (
     <div className="App">
       <h1>Firebase App</h1>
-      <button onClick={putData}>Put Data</button>
+      <Signup/>
+      
     </div>
   );
 }
