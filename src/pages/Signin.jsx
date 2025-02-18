@@ -1,20 +1,22 @@
 import React, { useState } from "react";
-import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth'
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "../firebase";
 
-const auth = getAuth(app)
+const auth = getAuth(app);
 
-const Signup = () => {
+const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const signupUser = () => {
-    createUserWithEmailAndPassword(auth, email, password).then(e => alert("User created successfully"))
-  }
+  const signinUser = () => {
+    signInWithEmailAndPassword(auth, email, password).then((e) =>
+      alert("User signedin successfully")
+    ).catch(err => alert("Invalid credentials"));
+  };
 
   return (
-    <div className="signup-page">
-        <h3>Signup Page</h3>
+    <div className="signin-page">
+        <h3>Signin Page</h3>
       <label>Email</label>
       <input
         type="email"
@@ -32,11 +34,11 @@ const Signup = () => {
         value={password}
         required
       />
-      <span>*Min of 6 chars</span>
+
       <br />
-      <button onClick={signupUser}>Signup</button>
+      <button onClick={signinUser}>Signin</button>
     </div>
   );
 };
 
-export default Signup;
+export default Signin;
