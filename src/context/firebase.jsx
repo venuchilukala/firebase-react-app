@@ -1,7 +1,13 @@
 import { initializeApp } from "firebase/app";
 import { createContext, useContext } from "react";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
 import { getDatabase, set, ref } from "firebase/database";
+import { GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCwLk64XmwS44mudqf-4Sl59LeRd78lbNY",
@@ -16,14 +22,26 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(firebaseApp);
 const database = getDatabase(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
 
 export const FirebaseContext = createContext(null);
 export const useFirebase = () => useContext(FirebaseContext);
 
 export const FirebaseProvider = (props) => {
+  const navigate = useNavigate();
+
   const signupUser = (email, password) => {
     return createUserWithEmailAndPassword(firebaseAuth, email, password)
       .then((e) => alert(`User with ${email} is created`))
+      .catch((e) => alert(e.message));
+  };
+
+  const signinWithGoogle = () => {
+    signInWithPopup(firebaseAuth, googleProvider)
+      .then(() => {
+        alert("Signed in with Google");
+        navigate("/");
+      })
       .catch((e) => alert(e.message));
   };
 
@@ -34,7 +52,7 @@ export const FirebaseProvider = (props) => {
   };
 
   return (
-    <FirebaseContext.Provider value={{ signupUser, putData }}>
+    <FirebaseContext.Provider value={{ signupUser, putData, signinWithGoogle }}>
       {props.children}
     </FirebaseContext.Provider>
   );

@@ -1,22 +1,19 @@
-import { useState } from 'react';
+import { Route, Routes } from 'react-router-dom';
 import './App.css';
-import { useFirebase } from './context/firebase';
+import Signup from './pages/Signup';
+import Home from './pages/Home';
 
 
 
 function App() {
-  const firebase = useFirebase()
-  console.log(firebase)
-
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
 
   return (
     <div className="App">
       <h1>Firebase</h1>
-      <input onChange={(e) => setEmail(e.target.value)} value={email} type="email" placeholder='Enter your email' required />
-      <input onChange={(e) => setPassword(e.target.value)} value={password} type="password" placeholder='Enter your password' required />
-      <button onClick={(e)=>{firebase.signupUser(email, password); firebase.putData("users/" + "venu",{email, password})}}>Signup</button>
+        <Routes>
+          <Route path="/" element={<Home/>}/>
+          <Route path='/signup' element={<Signup/>}/>
+        </Routes>
     </div >
   );
 }
