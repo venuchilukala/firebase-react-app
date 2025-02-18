@@ -11,6 +11,18 @@ import {
 } from "firebase/auth";
 import { getDatabase, set, ref } from "firebase/database";
 import { GoogleAuthProvider } from "firebase/auth";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  doc,
+  getDoc,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCwLk64XmwS44mudqf-4Sl59LeRd78lbNY",
@@ -24,8 +36,13 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(firebaseApp);
-const database = getDatabase(firebaseApp);
 const googleProvider = new GoogleAuthProvider();
+
+// Realtime database
+const database = getDatabase(firebaseApp);
+
+// FireStore
+const firestoreDb = getFirestore(firebaseApp);
 
 export const FirebaseContext = createContext(null);
 export const useFirebase = () => useContext(FirebaseContext);
@@ -39,7 +56,6 @@ export const FirebaseProvider = (props) => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
       if (user) {
         // User is logged in
-        console.log("Hello ", user);
         setUser(user);
       } else {
         console.log("User is logged out");
@@ -63,7 +79,7 @@ export const FirebaseProvider = (props) => {
     return signInWithEmailAndPassword(firebaseAuth, email, password)
       .then((e) => {
         alert(`User with ${email} is signed`);
-        console.log("User is logged in")
+        console.log("User is logged in");
         navigate("/");
       })
       .catch((e) => alert(e.message));
@@ -82,6 +98,76 @@ export const FirebaseProvider = (props) => {
     signOut(firebaseAuth);
   };
 
+  // Cloud Firestore database
+  const writeData = async () => {
+    const result = await addDoc(collection(firestoreDb, "users"), {
+      name: "Mahi",
+      age: 21,
+      gender: "Female",
+      city: "Hyderabad",
+    });
+    console.log("Result", result);
+  };
+
+  const makeSubCollection = async () => {
+    const result = await addDoc(
+      collection(firestoreDb, "users/E8LOS7dmVANnouefSn76/designation/"),
+      {
+        designation: "HR",
+        salary: 60000,
+        company: "Delloite",
+        location: "Hyderabad",
+      }
+    );
+    console.log("Result", result);
+  };
+
+  const getDocumnetById = async () => {
+    const docRef = doc(firestoreDb, "users", "0M6LAW6zpSOmRnACBBYe");
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      console.log("Data", docSnap.data());
+    } else {
+      console.log("No data found");
+    }
+  };
+
+  const getDocumentsByQuery = async () => {
+    const userRef = collection(firestoreDb, "users");
+    const q = query(userRef, where("city", "==", "Hyderabad"));
+
+    const querySnaps = await getDocs(q);
+
+    querySnaps.forEach((doc) => {
+      console.log("Doc Data", doc.data());
+    });
+  };
+
+  const updateDocumentById = async () => {
+    const docRef = doc(firestoreDb, "users", "E8LOS7dmVANnouefSn76");
+    await updateDoc(docRef, {
+      city: "Pune",
+    });
+  };
+
+  const deleteDocumentById = async () => {
+    try {
+      const docRef = doc(
+        firestoreDb,
+        "users",
+        "E8LOS7dmVANnouefSn76",
+        "designation",
+        "5UHxlzagU5chHXec3UYg"
+      );
+      await deleteDoc(docRef);
+      console.log("Document successfully deleted!");
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
+  };
+
+  // Realtime database
   const putData = (path, data) => {
     set(ref(database, path), data)
       .then((e) => alert("Data added"))
@@ -94,7 +180,13 @@ export const FirebaseProvider = (props) => {
     signinWithGoogle,
     user,
     userSignout,
-    siginUser
+    siginUser,
+    writeData,
+    makeSubCollection,
+    getDocumnetById,
+    getDocumentsByQuery,
+    updateDocumentById,
+    deleteDocumentById,
   };
 
   return (
