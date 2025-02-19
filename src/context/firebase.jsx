@@ -9,7 +9,7 @@ import {
   signOut,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { getDatabase, set, ref } from "firebase/database";
+import { getDatabase, set, ref, child, get, onValue } from "firebase/database";
 import { GoogleAuthProvider } from "firebase/auth";
 import {
   getFirestore,
@@ -49,6 +49,7 @@ export const useFirebase = () => useContext(FirebaseContext);
 
 export const FirebaseProvider = (props) => {
   const [user, setUser] = useState(null);
+  const [name, setName] = useState(null)
 
   const navigate = useNavigate();
 
@@ -168,15 +169,27 @@ export const FirebaseProvider = (props) => {
   };
 
   // Realtime database
-  const putData = (path, data) => {
-    set(ref(database, path), data)
-      .then((e) => alert("Data added"))
-      .catch((e) => alert("Error occured while adding"));
+  const putData = (key, data) => {
+    set(ref(database, key), data)
+    .then(() => alert(`Data added to Realtime DB at ${key}`))
+      .catch(() => alert("Error occured while adding"));
   };
+
+  const getData = async(key) => {
+    const dbRef = ref(database)
+    get(child(dbRef, key)).then(snapshot => console.log(snapshot.val()))
+  }
+
+  useEffect(()=>{
+    onValue(ref(database,"grandfather/father/child"), (snapShot) => {
+      setName(snapShot.val().name)
+    })
+  })
 
   const authInfo = {
     signupUser,
     putData,
+    getData,
     signinWithGoogle,
     user,
     userSignout,
@@ -187,6 +200,7 @@ export const FirebaseProvider = (props) => {
     getDocumentsByQuery,
     updateDocumentById,
     deleteDocumentById,
+    name
   };
 
   return (
